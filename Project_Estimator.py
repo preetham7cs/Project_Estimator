@@ -1,4 +1,6 @@
 import streamlit as st
+import pandas as pd
+import altair as alt
 
 def estimate_project_cost(num_team_members, complexity, estimated_days):
     complexity_multiplier = {
@@ -16,6 +18,23 @@ def estimate_project_cost(num_team_members, complexity, estimated_days):
     adjusted_timeline = estimated_days * complexity_multiplier[complexity]
 
     return cost, adjusted_timeline
+
+
+def generate_delay_impact(num_team_members, complexity, estimated_days, max_delay=30):
+    """Return a DataFrame showing cost and timeline for incremental delays."""
+    rows = []
+    for delay in range(max_delay + 1):
+        cost, timeline = estimate_project_cost(
+            num_team_members,
+            complexity,
+            estimated_days + delay,
+        )
+        rows.append({
+            "Delay Days": delay,
+            "Cost": cost,
+            "Adjusted Timeline": timeline,
+        })
+    return pd.DataFrame(rows)
 
 # Streamlit App UI
 st.title("🛠️ Project Cost & Timeline Estimator")
@@ -48,6 +67,19 @@ try:
     st.subheader("📊 Estimated Results")
     st.metric("💰 Project Cost", f"${total_cost:,.2f}")
     st.metric("⏳ Adjusted Timeline", f"{total_days:.1f} days")
+
+    delay_df = generate_delay_impact(num_team_members, complexity, estimated_days)
+    delay_chart = (
+        alt.Chart(delay_df)
+        .transform_fold(["Cost", "Adjusted Timeline"], as_=["Resource", "Value"])
+        .mark_line()
+        .encode(
+            x=alt.X("Delay Days:Q", title="Additional Delay (days)"),
+            y=alt.Y("Value:Q", title="Value"),
+            color="Resource:N",
+        )
+    )
+    st.altair_chart(delay_chart, use_container_width=True)
 
 except ValueError as e:
     st.error(f"Input Error: {e}")
