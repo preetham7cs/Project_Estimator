@@ -37,7 +37,7 @@ def generate_delay_impact(num_team_members, complexity, estimated_days, max_dela
     return pd.DataFrame(rows)
 
 # Streamlit App UI
-st.title("🛠️ Project Cost & Timeline Estimator")
+st.title("🛠️ Project Cost & Timeline Estimator with Projection")
 
 st.sidebar.header("Input Parameters")
 
