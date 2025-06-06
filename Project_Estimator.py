@@ -42,7 +42,7 @@ st.title("🛠️ Project Cost & Timeline Estimator with Projection")
 st.sidebar.header("Input Parameters")
 
 complexity = st.sidebar.selectbox(
-    "Select Project Complexity:",
+    "Select the Project Complexity:",
     options=["Low", "Medium", "High"]
 )
 
